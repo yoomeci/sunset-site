@@ -2,133 +2,257 @@ from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
+# ================= HOME =================
 home_html = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sunset Unit</title>
 
 <style>
 body {
     margin: 0;
-    font-family: Arial;
-    background: linear-gradient(270deg, #ff7e5f, #feb47b, #ffcc70, #ff6a88);
+    font-family: Arial, sans-serif;
+    background: linear-gradient(270deg, #000000, #1a1a1a, #333333, #000000);
     background-size: 800% 800%;
     animation: gradientMove 15s ease infinite;
     color: white;
-}
-
-/* NAV */
-nav {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px 40px;
-    background: rgba(0,0,0,0.2);
-}
-
-/* ANIMAÇÃO */
-.fade-up {
-    opacity: 0;
-    transform: translateY(40px);
-    animation: fadeUp 1s forwards;
-}
-
-.delay-1 { animation-delay: 0.3s; }
-.delay-2 { animation-delay: 0.6s; }
-
-/* CONTAINER */
-.container {
-    padding: 60px;
     text-align: center;
 }
 
-/* BOTÃO */
-.about-btn {
-    padding: 15px 30px;
-    background: linear-gradient(135deg, #ff9a8b, #ff6a88);
-    border-radius: 12px;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-/* CARDS */
-.cards {
-    margin-top: 60px;
+/* LOADER */
+#loader {
+    position: fixed;
+    inset: 0;
+    background: #000;
     display: flex;
     justify-content: center;
-    gap: 30px;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease;
+}
+
+#loader.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* GLITCH */
+.glitch {
+    position: relative;
+    font-size: 3em;
+    letter-spacing: 4px;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+}
+
+.glitch::before {
+    color: red;
+    animation: glitchTop 1.2s infinite;
+}
+
+.glitch::after {
+    color: cyan;
+    animation: glitchBottom 1.2s infinite;
+}
+
+@keyframes glitchTop {
+    0% { transform: translate(-2px,-2px); }
+    50% { transform: translate(2px,2px); }
+    100% { transform: translate(-2px,-2px); }
+}
+
+@keyframes glitchBottom {
+    0% { transform: translate(2px,2px); }
+    50% { transform: translate(-2px,-2px); }
+    100% { transform: translate(2px,2px); }
+}
+
+.container { padding: 60px; }
+
+.cards {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
 }
 
 .card {
-    width: 300px;
     background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
     padding: 40px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-
-    opacity: 0;
-    transform: translateY(40px);
-    animation: fadeUp 1s forwards;
+    border-radius: 15px;
+    width: 250px;
+    transition: 0.3s;
 }
 
-.card:nth-child(1) { animation-delay: 1s; }
-.card:nth-child(2) { animation-delay: 1.2s; }
+.card:hover {
+    transform: translateY(-15px) scale(1.07);
+    box-shadow: 0 0 20px rgba(255,255,255,0.2);
+}
 
 .card a {
     display: block;
     margin-top: 15px;
-    padding: 10px;
-    background: rgba(0,0,0,0.4);
+    padding: 12px;
+    background: #111;
     border-radius: 8px;
-    color: white;
     text-decoration: none;
+    color: white;
 }
 
-/* KEYFRAMES */
-@keyframes fadeUp {
-    to { opacity:1; transform: translateY(0); }
+footer {
+    margin-top: 60px;
+    font-size: 14px;
+    opacity: 0.8;
 }
 
 @keyframes gradientMove {
-    0% { background-position:0% 50%; }
-    50% { background-position:100% 50%; }
-    100% { background-position:0% 50%; }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 </style>
 </head>
 
 <body>
 
-<nav>
-<h1>Sunset</h1>
-<a href="/about" style="color:white;">About</a>
-</nav>
+<div id="loader">
+    <h1 class="glitch" data-text="SUNSET">SUNSET</h1>
+</div>
 
 <div class="container">
-<h1 class="fade-up">Sunset</h1>
-<h2 class="fade-up delay-1">Edit Unit</h2>
+    <h1>Sunset</h1>
+    <h2>Edit Unit</h2>
 
-<a class="about-btn fade-up delay-2" href="{{ url_for('about') }}">About Us</a>
+    <div class="cards">
+        <div class="card">
+            <h3>Socials</h3>
+            <a href="/socials">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>About Us</h3>
+            <a href="/about">Open</a>
+        </div>
+    </div>
+
+    <footer>© 2026 SUNSET LLC. All rights reserved.</footer>
+</div>
+
+<script>
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        document.getElementById("loader").classList.add("hidden");
+    }, 1000);
+});
+</script>
+
+</body>
+</html>
+"""
+
+# ================= SOCIALS =================
+socials_html = """
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Socials</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(270deg, #000, #222, #444, #000);
+    background-size: 800% 800%;
+    animation: gradientMove 15s infinite;
+    color: white;
+    text-align: center;
+}
+
+.container { padding: 60px; }
+
+.cards {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.card {
+    background: rgba(255,255,255,0.08);
+    padding: 40px;
+    border-radius: 15px;
+    width: 250px;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.05);
+}
+
+.card a {
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    background: #111;
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+}
+
+a.back {
+    display: block;
+    margin-top: 40px;
+    color: white;
+}
+
+footer {
+    margin-top: 40px;
+}
+
+@keyframes gradientMove {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>Socials</h1>
 
 <div class="cards">
-<div class="card">
-<h3>Discord</h3>
-<a href="https://discord.gg/9rsFPEHCSx">Join</a>
+    <div class="card">
+        <h3>Discord</h3>
+        <a href="https://discord.gg/9rsFPEHCSx" target="_blank">Join</a>
+    </div>
+
+    <div class="card">
+        <h3>TikTok</h3>
+        <a href="https://www.tiktok.com/@.sunsetcollective?_r=1&_t=ZS-95hmY2q8Q5g" target="_blank">View</a>
+    </div>
 </div>
 
-<div class="card">
-<h3>TikTok</h3>
-<a href="https://www.tiktok.com/@lxrymeci">View</a>
-</div>
-</div>
+<a class="back" href="/">← Back</a>
+
+<footer>© 2026 SUNSET LLC. All rights reserved.</footer>
 </div>
 
 </body>
 </html>
 """
 
+# ================= ABOUT =================
 about_html = """
 <!DOCTYPE html>
 <html>
@@ -138,51 +262,31 @@ about_html = """
 
 <style>
 body {
-    margin:0;
-    font-family:Arial;
-    background: linear-gradient(270deg, #ff7e5f, #feb47b, #ffcc70, #ff6a88);
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(270deg, #000, #222, #444, #000);
     background-size: 800% 800%;
-    animation: gradientMove 15s ease infinite;
-    color:white;
+    animation: gradientMove 15s infinite;
+    color: white;
+    text-align: center;
 }
 
-.container {
-    padding:60px;
-    text-align:center;
-}
+.container { padding: 60px; }
 
 .section {
-    max-width:800px;
-    margin:30px auto;
-    background:rgba(255,255,255,0.1);
-    padding:25px;
-    border-radius:15px;
-
-    opacity:0;
-    transform:translateY(40px);
-    animation: fadeUp 1s forwards;
+    max-width: 800px;
+    margin: 40px auto;
+    background: rgba(255,255,255,0.08);
+    padding: 25px;
+    border-radius: 15px;
 }
 
-.section:nth-child(2){animation-delay:0.2s;}
-.section:nth-child(3){animation-delay:0.4s;}
-.section:nth-child(4){animation-delay:0.6s;}
-.section:nth-child(5){animation-delay:0.8s;}
-
-a {
-    display:inline-block;
-    margin-top:30px;
-    color:white;
-}
-
-/* ANIMAÇÃO */
-@keyframes fadeUp {
-    to { opacity:1; transform:translateY(0); }
-}
+footer { margin-top: 40px; }
 
 @keyframes gradientMove {
-    0% { background-position:0% 50%; }
-    50% { background-position:100% 50%; }
-    100% { background-position:0% 50%; }
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
 }
 </style>
 </head>
@@ -190,40 +294,29 @@ a {
 <body>
 
 <div class="container">
-
 <h1>About Sunset</h1>
 
-<div class="section">
-<h3>Our Mission</h3>
-<p>Sunset is a creative editing team focused on high-quality visuals.</p>
-</div>
-
-<div class="section">
-<h3>Creativity</h3>
-<p>We accept editors, musicians and designers.</p>
-</div>
-
-<div class="section">
-<h3>Identity</h3>
-<p>We create clean visuals and strong branding.</p>
-</div>
-
-<div class="section">
-<h3>Community</h3>
-<p>We have an active and growing community.</p>
-</div>
+<div class="section"><p>Sunset is a creative editing collective focused on high-quality visuals.</p></div>
+<div class="section"><p>We accept editors, musicians, and designers.</p></div>
+<div class="section"><p>We build identity and community.</p></div>
 
 <a href="/">← Back</a>
 
+<footer>© 2026 SUNSET LLC. All rights reserved.</footer>
 </div>
 
 </body>
 </html>
 """
 
+# ROUTES
 @app.route("/")
 def home():
     return render_template_string(home_html)
+
+@app.route("/socials")
+def socials():
+    return render_template_string(socials_html)
 
 @app.route("/about")
 def about():
@@ -231,4 +324,4 @@ def about():
 
 if __name__ == "__main__":
     import os
-app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
